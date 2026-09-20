@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="pt-AO">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0f172a">
+<title>Simulador de Importação — Arauto Manuel</title>
+<style>
+*{box-sizing:border-box}
+:root{--bg:#f4f7fb;--card:#fff;--text:#162033;--muted:#64748b;--line:#e2e8f0;--accent:#2563eb;--accent2:#1d4ed8;--green:#15803d;--red:#dc2626;--soft:#f8fafc}
+body{margin:0;background:linear-gradient(180deg,#eef4ff 0,#f8fafc 280px,#f4f7fb 100%);font-family:Inter,Arial,sans-serif;color:var(--text)}
+.container{max-width:1250px;margin:auto;padding:18px}
+.card{background:var(--card);border:1px solid rgba(226,232,240,.9);border-radius:20px;padding:20px;box-shadow:0 12px 35px rgba(15,23,42,.08)}
+.header{display:flex;align-items:flex-start;justify-content:space-between;gap:18px;margin-bottom:20px}
+.brand{display:flex;align-items:center;gap:13px}.brand-mark{width:48px;height:48px;border-radius:14px;background:linear-gradient(135deg,#2563eb,#0f172a);color:#fff;display:grid;place-items:center;font-weight:800;font-size:18px;box-shadow:0 8px 20px rgba(37,99,235,.25)}
+h1{font-size:25px;margin:0 0 4px;letter-spacing:-.4px}.subtitle{margin:0;color:var(--muted);font-size:13px}.creator{font-size:12px;color:var(--muted);margin-top:6px}.creator strong{color:var(--text)}
+.actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}.btn{border:1px solid var(--line);background:#fff;color:var(--text);padding:10px 13px;border-radius:10px;font-weight:700;cursor:pointer;font-size:13px}.btn:hover{background:var(--soft)}.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}.btn.primary:hover{background:var(--accent2)}.btn.danger{color:var(--red)}
+.section{margin-top:18px}.section-title{font-size:14px;font-weight:800;margin:0 0 10px}.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.field label{display:block;font-size:12px;font-weight:800;margin-bottom:6px}.field input{width:100%;border:1px solid #cbd5e1;border-radius:10px;padding:11px 12px;font-size:15px;outline:none;background:#fff;color:var(--text)}.field input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(37,99,235,.10)}
+.products-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:10px}.hint{font-size:12px;color:var(--muted)}
+.table-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:13px}table{width:100%;border-collapse:separate;border-spacing:0;min-width:1050px}th,td{padding:10px 9px;text-align:left;border-bottom:1px solid var(--line)}th{font-size:11px;text-transform:uppercase;letter-spacing:.25px;background:#f8fafc;color:#475569;white-space:nowrap}tbody tr:last-child td{border-bottom:0}td input{width:100%;border:1px solid #d7dee8;border-radius:8px;padding:9px;font-size:14px}.name{min-width:180px}.num{min-width:115px}.result{white-space:nowrap;font-weight:800;text-align:right}.profit-positive{color:var(--green)}.profit-negative{color:var(--red)}.remove{border:0;background:#fee2e2;color:#b91c1c;width:30px;height:30px;border-radius:8px;font-weight:900;cursor:pointer}.remove:hover{background:#fecaca}
+.summary{margin-top:18px;display:grid;grid-template-columns:repeat(3,1fr);gap:11px}.total{padding:14px;border:1px solid var(--line);border-radius:13px;background:#f8fafc}.total.highlight{background:#eff6ff;border-color:#bfdbfe}.total span{display:block;font-size:11px;font-weight:800;color:#64748b;margin-bottom:6px}.total strong{font-size:18px}.total.highlight strong{color:#1d4ed8}
+.note{font-size:12px;color:#64748b;line-height:1.55;margin:15px 0 0;padding:12px 13px;background:#f8fafc;border-radius:11px}.footer{text-align:center;color:#94a3b8;font-size:11px;margin-top:14px}
+@media(max-width:900px){.grid{grid-template-columns:repeat(2,1fr)}.summary{grid-template-columns:repeat(2,1fr)}.header{flex-direction:column}.actions{justify-content:flex-start}}
+@media(max-width:600px){.container{padding:9px}.card{padding:13px;border-radius:16px}.brand-mark{width:42px;height:42px;border-radius:12px}h1{font-size:20px}.grid{grid-template-columns:1fr}.summary{grid-template-columns:1fr}.actions{width:100%}.actions .btn{flex:1}.products-head{align-items:flex-start;flex-direction:column}.hint{font-size:11px}}
+@media print{body{background:#fff}.container{padding:0}.card{box-shadow:none;border:0;padding:0}.actions,.remove-col,.remove{display:none!important}.table-wrap{overflow:visible;border:1px solid #ddd}table{min-width:0}.footer{margin-top:20px}.note{break-inside:avoid}.summary{grid-template-columns:repeat(3,1fr)}}
+</style>
+</head>
+<body>
+<div class="container"><main class="card">
+  <header class="header">
+    <div class="brand">
+      <div class="brand-mark">AM</div>
+      <div>
+        <h1>Simulador de Importação</h1>
+        <p class="subtitle">Calcule custos, total da importação e lucro por produto.</p>
+        <div class="creator">Criado por <strong>Arauto Manuel</strong></div>
+      </div>
+    </div>
+    <div class="actions">
+      <button class="btn" id="printBtn" type="button">🖨️ Imprimir / PDF</button>
+      <button class="btn danger" id="clearBtn" type="button">↺ Limpar</button>
+    </div>
+  </header>
+
+  <section class="section">
+    <h2 class="section-title">Dados da importação</h2>
+    <div class="grid">
+      <div class="field"><label for="rate">Câmbio (Kz/USD)</label><input id="rate" type="number" inputmode="decimal" min="0" step="any" placeholder="Ex.: 900"></div>
+      <div class="field"><label for="taxPct">Imposto sobre a operação (%)</label><input id="taxPct" type="number" inputmode="decimal" min="0" step="any" placeholder="Ex.: 14"></div>
+      <div class="field"><label for="otherTaxUsd">Outros impostos (USD)</label><input id="otherTaxUsd" type="number" inputmode="decimal" min="0" step="any" placeholder="0,00"></div>
+      <div class="field"><label for="otherTaxKz">Outros impostos (Kz)</label><input id="otherTaxKz" type="number" inputmode="decimal" min="0" step="any" placeholder="0,00"></div>
+      <div class="field"><label for="taxiKz">Táxi (Kz)</label><input id="taxiKz" type="number" inputmode="decimal" min="0" step="any" placeholder="0,00"></div>
+      <div class="field"><label for="otherCostsKz">Outros Custos (Kz)</label><input id="otherCostsKz" type="number" inputmode="decimal" min="0" step="any" placeholder="0,00"></div>
+      <div class="field"><label for="freightUsd">Frete total (USD)</label><input id="freightUsd" type="number" inputmode="decimal" min="0" step="any" placeholder="0,00"></div>
+      <div class="field"><label for="freightKz">Frete total (Kz)</label><input id="freightKz" type="number" inputmode="decimal" min="0" step="any" placeholder="0,00"></div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="products-head">
+      <div><h2 class="section-title" style="margin-bottom:3px">Produtos</h2><div class="hint">Preencha os produtos. Uma nova linha é criada automaticamente.</div></div>
+      <button class="btn primary" id="addBtn" type="button">＋ Adicionar produto</button>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr>
+          <th>Nome do produto</th><th>Valor do produto (USD)</th><th>Total do produto (USD)</th><th>Total do produto (Kz)</th><th>Preço de venda (Kz)</th><th>Lucro (Kz)</th><th class="remove-col"></th>
+        </tr></thead>
+        <tbody id="products"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="summary">
+    <div class="total"><span>Total dos produtos (USD)</span><strong id="totalProducts">0,00 USD</strong></div>
+    <div class="total"><span>Imposto do pedido (USD)</span><strong id="totalTaxUsd">0,00 USD</strong></div>
+    <div class="total"><span>Imposto do pedido (Kz)</span><strong id="totalTaxKz">0,00 Kz</strong></div>
+    <div class="total"><span>Outros impostos (USD)</span><strong id="totalOtherUsd">0,00 USD</strong></div>
+    <div class="total"><span>Outros impostos (Kz)</span><strong id="totalOtherKz">0,00 Kz</strong></div>
+    <div class="total"><span>Frete (USD)</span><strong id="totalFreightUsd">0,00 USD</strong></div>
+    <div class="total"><span>Frete (Kz)</span><strong id="totalFreightKz">0,00 Kz</strong></div>
+    <div class="total"><span>Total geral (USD)</span><strong id="totalUsd">0,00 USD</strong></div>
+    <div class="total highlight"><span>Total a pagar (Kz)</span><strong id="totalKz">0,00 Kz</strong></div>
+  </section>
+
+  <p class="note"><strong>Como o cálculo funciona:</strong> o imposto (%) é aplicado sobre a soma dos produtos, sem incluir o frete. Os custos gerais são distribuídos proporcionalmente entre os produtos para calcular o custo suportado e o lucro individual. Valores monetários são exibidos no formato 1 000,00 Kz/USD.</p>
+  <div class="footer">Simulador de Importação · Criado por Arauto Manuel</div>
+</main></div>
+
+<script>
+const products=document.getElementById('products');
+const ids=['rate','taxPct','otherTaxUsd','otherTaxKz','taxiKz','otherCostsKz','freightUsd','freightKz'];
+const $=id=>document.getElementById(id);
+function money(n){return new Intl.NumberFormat('pt-AO',{minimumFractionDigits:2,maximumFractionDigits:2}).format(n||0)}
+function addRow(focus=false){
+  const tr=document.createElement('tr');
+  tr.innerHTML=`<td><input class="name" type="text" placeholder="Ex.: Ténis"></td><td><input class="num product" type="number" inputmode="decimal" min="0" step="any" placeholder="0,00"></td><td class="result lineusd">0,00 USD</td><td class="result linekz">0,00 Kz</td><td><input class="num saleprice" type="number" inputmode="decimal" min="0" step="any" placeholder="0,00"></td><td class="result profit">0,00 Kz</td><td class="remove-col"><button class="remove" type="button" title="Remover produto">×</button></td>`;
+  products.appendChild(tr);
+  tr.querySelectorAll('input').forEach(i=>i.addEventListener('input',calculate));
+  tr.querySelector('.remove').addEventListener('click',()=>{if(products.querySelectorAll('tr').length>1)tr.remove();else tr.querySelectorAll('input').forEach(i=>i.value='');calculate()});
+  if(focus)tr.querySelector('.name').focus();
+}
+function ensureRow(){const rows=[...products.querySelectorAll('tr')];const last=rows[rows.length-1];if(last&&[...last.querySelectorAll('input')].some(i=>i.value.trim()!==''))addRow()}
+function calculate(){
+ const r=parseFloat($('rate').value)||0; const rows=[...products.querySelectorAll('tr')]; let totalProducts=0;
+ rows.forEach(tr=>totalProducts+=parseFloat(tr.querySelector('.product').value)||0);
+ const pct=parseFloat($('taxPct').value)||0, impostoUsd=totalProducts*pct/100, impostoKz=impostoUsd*r;
+ const otherTaxUsd=parseFloat($('otherTaxUsd').value)||0, otherTaxKz=parseFloat($('otherTaxKz').value)||0, taxiKz=parseFloat($('taxiKz').value)||0, otherCostsKz=parseFloat($('otherCostsKz').value)||0, freightUsd=parseFloat($('freightUsd').value)||0, freightKz=parseFloat($('freightKz').value)||0;
+ const totalUsd=totalProducts+impostoUsd+otherTaxUsd+freightUsd, totalKz=totalUsd*r+otherTaxKz+taxiKz+otherCostsKz+freightKz;
+ rows.forEach(tr=>{const product=parseFloat(tr.querySelector('.product').value)||0,saleprice=parseFloat(tr.querySelector('.saleprice').value)||0,share=totalProducts>0?product/totalProducts:0;const productTaxUsd=impostoUsd*share,productTaxKz=impostoKz*share,productTotalUsd=product+productTaxUsd,productTotalKz=product*r+productTaxKz;const supportedKz=productTotalKz+(otherTaxKz+taxiKz+otherCostsKz+freightKz)*share+(otherTaxUsd*r+freightUsd*r)*share;const profit=saleprice-supportedKz;tr.querySelector('.lineusd').textContent=money(productTotalUsd)+' USD';tr.querySelector('.linekz').textContent=money(productTotalKz)+' Kz';const p=tr.querySelector('.profit');p.textContent=money(profit)+' Kz';p.classList.remove('profit-positive','profit-negative');if(profit>0)p.classList.add('profit-positive');if(profit<0)p.classList.add('profit-negative')});
+ $('totalProducts').textContent=money(totalProducts)+' USD';$('totalTaxUsd').textContent=money(impostoUsd)+' USD';$('totalTaxKz').textContent=money(impostoKz)+' Kz';$('totalOtherUsd').textContent=money(otherTaxUsd)+' USD';$('totalOtherKz').textContent=money(otherTaxKz)+' Kz';$('totalFreightUsd').textContent=money(freightUsd)+' USD';$('totalFreightKz').textContent=money(freightKz)+' Kz';$('totalUsd').textContent=money(totalUsd)+' USD';$('totalKz').textContent=money(totalKz)+' Kz';
+}
+ids.forEach(id=>$(id).addEventListener('input',calculate));
+$('addBtn').addEventListener('click',()=>addRow(true));
+$('printBtn').addEventListener('click',()=>window.print());
+$('clearBtn').addEventListener('click',()=>{if(!confirm('Limpar toda a simulação?'))return;ids.forEach(id=>$(id).value='');products.innerHTML='';addRow();calculate()});
+products.addEventListener('input',()=>{calculate();ensureRow()});
+addRow();
+</script>
+</body>
+</html>
