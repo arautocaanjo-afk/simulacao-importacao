@@ -1,0 +1,72 @@
+name: Gerar APK Final
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Baixar código
+        uses: actions/checkout@v4
+
+      - name: Descompactar projeto Android
+        run: |
+          unzip -q SimuladorImportacaoAndroid.zip -d projeto_extraido
+
+          SETTINGS_FILE=$(find projeto_extraido -type f \( -name "settings.gradle" -o -name "settings.gradle.kts" \) | head -n 1)
+
+          if [ -z "$SETTINGS_FILE" ]; then
+            echo "ERRO: settings.gradle não foi encontrado dentro do ZIP."
+            exit 1
+          fi
+
+          PROJECT_DIR=$(dirname "$SETTINGS_FILE")
+          echo "Projeto Android encontrado em: $PROJECT_DIR"
+
+          cp -a "$PROJECT_DIR"/. .
+
+          echo "android.useAndroidX=true" >> gradle.properties
+          echo "android.enableJetifier=true" >> gradle.properties
+
+      - name: Corrigir versões Kotlin
+        run: |
+          cat >> gradle.properties <<'EOF'
+          kotlin.jvm.target.validation.mode=warning
+          EOF
+
+      - name: Configurar Java
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Instalar Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
+
+      - name: Forçar Kotlin compatível
+        run: |
+          mkdir -p ~/.gradle
+          cat > ~/.gradle/init.gradle <<'EOF'
+          allprojects {
+              configurations.all {
+                  resolutionStrategy.eachDependency { details ->
+                      if (details.requested.group == "org.jetbrains.kotlin") {
+                          details.useVersion("1.8.22")
+                      }
+                  }
+              }
+          }
+          EOF
+
+      - name: Gerar APK
+        run: gradle assembleDebug --init-script ~/.gradle/init.gradle
+
+      - name: Disponibilizar APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: simulador-importacao-apk
+          path: app/build/outputs/apk/debug/app-debug.apk
